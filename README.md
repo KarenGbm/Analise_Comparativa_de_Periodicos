@@ -1,62 +1,118 @@
-# Analise Comparativa de Periodicos dos cursos de Ciências Humanas
-
+📊 Análise de Periódicos Científicos
 1. Contexto e Preparação dos Dados
-Inicialmente, foram importados dois arquivos CSV para o PostgreSQL. Para facilitar a manipulação dos dados, utilizei o Dbeaver.
 
-Após, foram realizados tratamentos para garantir a integridade e consistência dos dados,
-incluindo correção de nomes de colunas, padronização de textos e de nomes de colunas, tratamento de duplicatas e
-nulos, além de ajustes de tipos de dados.
-Também foi realizada a padronização do ISSN com a criação da coluna ISSN_CLEAN, incluindo separação de múltiplos valores e
-remoção de caracteres inválidos.
+Inicialmente, foram importados dois arquivos CSV para o PostgreSQL. Para facilitar a manipulação dos dados, foi utilizada a ferramenta DBeaver.
 
-3. Integração das Bases
-Foi criada uma view unificada contendo informações como ISSN, título, QUALIS, SJR, quartil,
-H-index, citações e país. Após a padronização do ISSN, a correspondência entre as bases
-aumentou significativamente, resultando em aproximadamente 1500 registros válidos para
-análise.
+Após a importação, foram realizados diversos tratamentos com o objetivo de garantir a integridade e consistência dos dados, incluindo:
 
-4. Análises Realizadas
-   
+Correção e padronização dos nomes de colunas
+Padronização de textos
+Tratamento de valores nulos
+Remoção de duplicidades
+Ajustes de tipos de dados
+
+Além disso, foi realizada a padronização do ISSN, com a criação da coluna ISSN_CLEAN, contemplando:
+
+Separação de múltiplos ISSNs em um único campo
+Remoção de caracteres inválidos
+Normalização do formato
+2. Integração das Bases
+
+Foi criada uma view unificada contendo as seguintes informações:
+
+ISSN
+Título
+QUALIS
+SJR
+Quartil
+H-index
+Número de citações
+País
+
+Após a padronização do ISSN, houve um aumento significativo na correspondência entre as bases, resultando em aproximadamente 1500 registros válidos para análise.
+
+3. Análises Realizadas
 3.1 Qualidade das Publicações (QUALIS)
-A distribuição das classificações QUALIS mostrou predominância de periódicos em níveis
-intermediários, com maior concentração em periódicos de excelência (A1).
 
+A distribuição das classificações QUALIS evidenciou:
+
+Predominância de periódicos em níveis intermediários
+Maior concentração em periódicos de excelência (A1)
 3.2 Impacto vs Volume
-Observou-se uma tendência positiva entre o número de citações e o SJR, indicando que
-periódicos mais citados tendem a ter maior impacto. No entanto, essa relação não é perfeita,
-havendo casos de periódicos com muitas citações e baixo impacto. O QUALIS também não se
-mostrou totalmente alinhado com métricas internacionais.
 
+Foi observada uma tendência positiva entre:
+
+Número de citações
+Índice SJR
+
+Ou seja, periódicos mais citados tendem a apresentar maior impacto. No entanto:
+
+A relação não é perfeitamente linear
+Existem periódicos com muitas citações e baixo impacto
+O QUALIS não está totalmente alinhado com métricas internacionais
 3.3 Benchmarking Internacional
-Os periódicos internacionais apresentam maior média de SJR e H-index em comparação aos
-brasileiros. Apenas cerca de 10% dos periódicos estão classificados como Q1, indicando
-baixa representatividade de alto impacto na base analisada.
 
-6. KPIs
-Foram criados indicadores-chave, incluindo total de periódicos, média de citações(3 anos) e
-percentual de periódicos Q1 (~10%).
+A análise comparativa mostrou que:
 
-8. Implicações
-Durante o processo de integração das bases, foi identificado que, apesar do volume inicial bastante elevado de registros, apenas aproximadamente 1500 registros puderam ser efetivamente utilizados na análise cruzada. Isso ocorreu devido a diferença de padronização do ISSN entre as duas bases, existência de multiplo issn para o mesmo periódico e dados ausentes. Sendo assim, a análise foi realizada sobre a interseção das bases. Os resultados refletem apenas os dados com registros em comum.
+Periódicos internacionais possuem maior média de SJR e H-index
+Apenas cerca de 10% dos periódicos são classificados como Q1
 
-9. Construção do Dashboard no Power bi
-O dashbord foi desenvolvido no Power Bi com conexão direta ao banco que criei no Postgresql, onde os dados ja estavam previamente tratados. Foi utilizada uma view unificada, construída no banco, contendo os dados integrados das duas tabelas.
-Para suporte as analises, foram criadas medidas dax para os periódicos  classificados como Q1:
+Isso indica uma baixa representatividade de periódicos de alto impacto na base analisada.
+
+4. KPIs (Indicadores-Chave)
+
+Foram definidos os seguintes indicadores:
+
+Total de periódicos
+Média de citações (últimos 3 anos)
+Percentual de periódicos Q1 (~10%)
+5. Implicações da Análise
+
+Durante o processo de integração das bases, foi identificado que:
+
+Apesar do grande volume inicial de dados, apenas ~1500 registros puderam ser utilizados
+Principais causas:
+Diferenças na padronização do ISSN
+Existência de múltiplos ISSNs para o mesmo periódico
+Dados ausentes
+
+Portanto:
+
+👉 A análise foi realizada apenas sobre a interseção das bases
+👉 Os resultados refletem somente os registros em comum entre as fontes
+
+6. Construção do Dashboard (Power BI)
+
+O dashboard foi desenvolvido no Power BI, com conexão direta ao banco PostgreSQL previamente estruturado.
+
+Fonte de Dados
+Utilização de uma view unificada construída no banco
+Dados já tratados e integrados previamente
+Medidas DAX
+📌 Percentual de Periódicos Q1
 %PeriodicosQ1 = 
 DIVIDE(
     CALCULATE(
-       COUNT('public analise_periodicos_com_dados_completos'[issn_clean]),
+        COUNT('public analise_periodicos_com_dados_completos'[issn_clean]),
         'public analise_periodicos_com_dados_completos'[sjr_best_quartile] = "Q1"
     ),
     CALCULATE(
-       COUNT('public analise_periodicos_com_dados_completos'[issn_clean]),
+        COUNT('public analise_periodicos_com_dados_completos'[issn_clean]),
         ALL('public analise_periodicos_com_dados_completos')
     )
-   para as regiões:
-   Regiao = IF([country] = "Brazil", "Brasil", "Internacional")
-Para as visualizações, utilizei graficos em barra, de dispersão, de barras empilhadas, tabelas e cartões.
+)
+🌍 Classificação por Região
+Regiao = IF([country] = "Brazil", "Brasil", "Internacional")
+Visualizações Utilizadas
+Gráficos de barras
+Gráficos de dispersão
+Barras empilhadas
+Tabelas
+Cartões (KPIs)
+7. Conclusões
 
-11. Conclusões
-A análise evidencia que métricas quantitativas (citações) e classificações institucionais
-(QUALIS) não são perfeitamente alinhadas. A base apresenta maior concentração em
-periódicos de impacto intermediário e menor presença em periódicos de alto impacto.
+A análise evidencia que:
+
+Métricas quantitativas (citações) e classificações institucionais (QUALIS) não estão totalmente alinhadas
+Existe uma maior concentração de periódicos em níveis intermediários de impacto
+Há uma baixa presença de periódicos de alto impacto (Q1) na base analisada
