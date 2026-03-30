@@ -37,7 +37,24 @@ Foram criados indicadores-chave, incluindo total de periódicos, média de cita�
 percentual de periódicos Q1 (~10%).
 
 8. Implicações
-Durante o processo de integração das bases, foi identificado que, apesar do volume inicial bastante elevado de registros, apenas aproximadamente 1500 registros puderam ser efetivamente utilizados na análise cruzada. Isso ocorreu devido a diferença de padronização do ISSN entre as duas bases, existência de multiplo issn para o mesmo periódico e dados ausentes. Sendo assim, a análise foi realizada sobre a interseção das bases. Os resultados refletem apenas os dados com registros em comum. 
+Durante o processo de integração das bases, foi identificado que, apesar do volume inicial bastante elevado de registros, apenas aproximadamente 1500 registros puderam ser efetivamente utilizados na análise cruzada. Isso ocorreu devido a diferença de padronização do ISSN entre as duas bases, existência de multiplo issn para o mesmo periódico e dados ausentes. Sendo assim, a análise foi realizada sobre a interseção das bases. Os resultados refletem apenas os dados com registros em comum.
+
+9. Construção do Dashboard no Power bi
+O dashbord foi desenvolvido no Power Bi com conexão direta ao banco que criei no Postgresql, onde os dados ja estavam previamente tratados. Foi utilizada uma view unificada, construída no banco, contendo os dados integrados das duas tabelas.
+Para suporte as analises, foram criadas medidas dax para os periódicos  classificados como Q1:
+%PeriodicosQ1 = 
+DIVIDE(
+    CALCULATE(
+       COUNT('public analise_periodicos_com_dados_completos'[issn_clean]),
+        'public analise_periodicos_com_dados_completos'[sjr_best_quartile] = "Q1"
+    ),
+    CALCULATE(
+       COUNT('public analise_periodicos_com_dados_completos'[issn_clean]),
+        ALL('public analise_periodicos_com_dados_completos')
+    )
+   para as regiões:
+   Regiao = IF([country] = "Brazil", "Brasil", "Internacional")
+Para as visualizações, utilizei graficos em barra, de dispersão, de barras empilhadas, tabelas e cartões.
 
 11. Conclusões
 A análise evidencia que métricas quantitativas (citações) e classificações institucionais
