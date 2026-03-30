@@ -1,42 +1,6 @@
 -- =========================================
--- 1. CRIAÇÃO DAS TABELAS
+-- 1. Passo 1 foi integrar os dados das tabelas no postgresql
 -- =========================================
-
-CREATE TABLE arquivof1 (
-    issn TEXT,
-    title TEXT,
-    periodico TEXT,
-    qualis TEXT,
-    fi_sjr numeric,
-    h_index int,
-    citacoes_2019_2021 int,
-    citacoes_media int
-);
-
-CREATE TABLE arquivof2 (
-    rank_position INTEGER,
-    sourceid TEXT,
-    title TEXT,
-    type_name TEXT,
-    issn TEXT,
-    sjr TEXT,
-    sjr_best_quartile TEXT,
-    h_index INTEGER,
-    total_docs2022 INTEGER,
-    total_docs3years INTEGER,
-    total_refs INTEGER,
-    total_cites3years INTEGER,
-    citable_docs3years INTEGER,
-    cites_doc2years TEXT,
-    ref_doc TEXT,
-    country TEXT,
-    region TEXT,
-    publisher TEXT,
-    coverage TEXT,
-    categories TEXT,
-    areas TEXT
-);
-
 -- =========================================
 -- 2. TRATAMENTO DE DADOS
 -- =========================================
@@ -57,6 +21,7 @@ add column ISSN_CLEAN text
 
 
 -- Limpar e converter sourceid
+    
 UPDATE arquivof2
 SET sourceid = TRIM(REPLACE(sourceid, '.', ''));
 
@@ -71,7 +36,7 @@ UPDATE arquivof1
 SET periodico = INITCAP(periodico);
 
 -- =========================================
--- 4. VIEW PARA SEPARAR ISSN
+-- 4. VIEW PARA SEPARAR ISSN (pois haviam registros com 2 issn na mesma linha)
 -- =========================================
 
 CREATE OR REPLACE VIEW issn_por_publicacao AS
@@ -81,7 +46,7 @@ SELECT
 FROM arquivof2;
 
 -- =========================================
--- 5. VIEW FINAL (ANÁLISE CRUZADA)
+-- 5. VIEW FINAL (ANÁLISE CRUZADA com a view anterior)
 -- =========================================
 
 CREATE OR REPLACE VIEW analise_periodicos_com_dados_completos AS
